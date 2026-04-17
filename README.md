@@ -1,4 +1,8 @@
 # 🎮 Game Backlog API
+![Python](https://img.shields.io/badge/Python-3.14-blue?style=for-the-badge&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?style=for-the-badge&logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 API REST desenvolvida com **FastAPI**, **PostgreSQL** e **SQLModel** para gerenciar um backlog de jogos.
 
