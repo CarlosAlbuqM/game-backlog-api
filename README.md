@@ -26,6 +26,10 @@ A proposta da API é permitir o cadastro e gerenciamento de jogos com informaç�
 - Deletar jogo
 - Filtrar jogos por status
 - Filtrar jogos por plataforma
+- Filtrar por gênero
+- Paginação com limit e offset
+- Resumo por status
+- Resumo por gênero
 
 ## 🕹️ Status disponíveis
 
@@ -86,6 +90,8 @@ Após iniciar o projeto, acesse:
 - `GET /games/{id}`
 - `PUT /games/{id}`
 - `DELETE /games/{id}`
+- `GET /games/summary`
+- `GET /games/summary/genres`
 
 ## 🧪 Exemplo de requisição
 

@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlmodel import Session, select
+from sqlalchemy import func
 
 from app.database import get_session
 from app.models import Game
@@ -29,6 +30,9 @@ def create_game(game_data: GameCreate, session: Session = Depends(get_session)):
 def list_games(
     status: Optional[str] = Query(default=None),
     platform: Optional[str] = Query(default=None),
+    genre: Optional[str] = Query(default=None),
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     session: Session = Depends(get_session)
 ):
     statement = select(Game)
@@ -39,8 +43,58 @@ def list_games(
     if platform:
         statement = statement.where(Game.platform == platform)
 
+    if genre:
+        statement = statement.where(Game.genre == genre)
+
+    statement = statement.offset(offset).limit(limit)
+
     games = session.exec(statement).all()
     return games
+
+@app.get("/games/summary")
+def get_games_summary(session: Session = Depends(get_session)):
+    total_games = session.exec(
+        select(func.count()).select_from(Game)
+    ).one()
+
+    completed = session.exec(
+        select(func.count()).where(Game.status == "completed")
+    ).one()
+
+    playing = session.exec(
+        select(func.count()).where(Game.status == "playing")
+    ).one()
+
+    backlog = session.exec(
+        select(func.count()).where(Game.status == "backlog")
+    ).one()
+
+    dropped = session.exec(
+        select(func.count()).where(Game.status == "dropped")
+    ).one()
+
+    return {
+        "total_games": total_games,
+        "completed": completed,
+        "playing": playing,
+        "backlog": backlog,
+        "dropped": dropped
+    }
+
+@app.get("/games/summary/genres")
+def get_games_by_genre(session: Session = Depends(get_session)):
+    statement = (
+        select(Game.genre, func.count().label("count"))
+        .group_by(Game.genre)
+        .order_by(func.count().desc())
+    )
+
+    results = session.exec(statement).all()
+
+    return [
+        {"genre": genre, "count": count}
+        for genre, count in results
+    ]
 
 
 @app.get("/games/{game_id}", response_model=GameRead)
@@ -88,3 +142,4 @@ def delete_game(game_id: int, session: Session = Depends(get_session)):
     session.delete(game)
     session.commit()
     return
+
